@@ -46,8 +46,6 @@ app.get("/", (req, res) => {
 
 module.exports = app;
 
-if (process.env.NODE_ENV !== "production") {
-  app.listen(3000, () => {
+  app.listen(process.env.PORT || 4000, () => {
     console.log(`Server started at port 3000`);
   });
-}
