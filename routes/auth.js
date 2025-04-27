@@ -12,6 +12,6 @@ router.post("/signup", createNewUser);
 router.post("/login", loginUser);
 router.get("/users",isAuthenticated, getUsers);
 
-router.get("/user", isAuthenticated, fetchUserDetails);
+router.get("/user", fetchUserDetails);
 
 module.exports = router;
