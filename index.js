@@ -18,7 +18,7 @@ store.on('error', function(error) {
   console.log('Session store error:', error);
 });
 
-const authRoutes = require("./routes/auth");
+const authRoutes = require("./routes/auth.js");
 const productRoutes = require("./routes/product.js");
 
 app.use(cors());
@@ -32,8 +32,8 @@ app.use(
     saveUninitialized: false,
     store: store,
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 // 24 hours
-    }
+      maxAge: 1000 * 60 * 60 * 24, // 24 hours
+    },
   })
 );
 
@@ -46,7 +46,7 @@ app.get("/", (req, res) => {
 
 module.exports = app;
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === "production") {
   app.listen(3000, () => {
     console.log(`Server started at port 3000`);
   });
