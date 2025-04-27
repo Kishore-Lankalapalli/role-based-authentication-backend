@@ -94,12 +94,11 @@ exports.createNewUser = async (req, res, next) => {
       });
     }
 
-    console.log(e, "error");
 
     res.status(500).json({
       success: false,
       message: "Server error",
-      error: error.message,
+      error: e.message,
     });
   }
 };
