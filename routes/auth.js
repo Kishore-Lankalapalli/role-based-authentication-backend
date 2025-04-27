@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post("/signup", createNewUser);
 router.post("/login", loginUser);
-router.get("/users",isAuthenticated, getUsers);
+router.get("/users", getUsers);
 
 router.get("/user", fetchUserDetails);
 
