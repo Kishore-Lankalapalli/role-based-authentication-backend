@@ -40,12 +40,13 @@ app.use(
 app.use("/", authRoutes);
 app.use("/product", productRoutes);
 
-app.get("/", (req, res) => {
-  res.send("Express server is running successfully");
-});
+app.get("/", (req, res) => 
+  res.send("Express server is running successfully")
+);
 
-module.exports = app;
 
-  app.listen(process.env.PORT || 4000, () => {
-    console.log(`Server started at port 3000`);
-  });
+
+  // app.listen(process.env.PORT || 4000, () => {
+  //   console.log(`Server started at port 3000`);
+  // });
+  module.exports = app;
