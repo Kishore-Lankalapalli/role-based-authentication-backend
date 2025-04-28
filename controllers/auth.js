@@ -1,5 +1,5 @@
 const yup = require("yup");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 
@@ -86,6 +86,7 @@ exports.createNewUser = async (req, res, next) => {
       message: "User created successfully",
     });
   } catch (e) {
+    console.log(e, "error");
     if (e?.name === "ValidationError") {
       return res.status(400).json({
         success: false,
@@ -93,7 +94,6 @@ exports.createNewUser = async (req, res, next) => {
         errors: e.errors,
       });
     }
-
 
     res.status(500).json({
       success: false,
