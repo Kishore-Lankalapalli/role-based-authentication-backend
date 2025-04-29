@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -5,9 +6,9 @@ const session = require("express-session");
 const db = require("./db/index.js");
 const MongoDbStore = require("connect-mongodb-session")(session);
 
-// Use environment variables for sensitive info
-const MONGODB_URI =
-  process.env.MONGODB_URI 
+
+
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const store = new MongoDbStore({
   uri: MONGODB_URI,
