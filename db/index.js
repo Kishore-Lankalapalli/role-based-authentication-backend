@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-let dburl = `mongodb+srv://kishore:RTdC0n06uyDTE7D4@cluster0.ysf7n.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0`;
+let dburl = process.env.MONGODB_URI
 
 mongoose.connect(dburl);
 

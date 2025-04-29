@@ -4,14 +4,18 @@ const {
   loginUser,
   getUsers,
   fetchUserDetails,
+  fetchSpecificUserDetails,
+  updateSpecificUser,
 } = require("../controllers/auth");
 const { isAuthenticated } = require("../middlewares/isAuthenticated");
 const router = express.Router();
 
-router.post("/signup", createNewUser);
+router.post("/signup", isAuthenticated, createNewUser);
 router.post("/login", loginUser);
-router.get("/users", getUsers);
+router.get("/users", isAuthenticated, getUsers);
 
-router.get("/user", fetchUserDetails);
+router.get("/user", isAuthenticated, fetchUserDetails);
+router.get("/user/:id", isAuthenticated, fetchSpecificUserDetails);
+router.put("/user/:id", isAuthenticated, updateSpecificUser);
 
 module.exports = router;

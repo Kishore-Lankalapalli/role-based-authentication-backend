@@ -55,13 +55,13 @@ exports.createNewUser = async (req, res, next) => {
   console.log(req.body, "request object");
 
   try {
-    // const user = req.user;
-    // if (!user.role !== "ADMIN") {
-    //   res.status(401).json({
-    //     code: 401,
-    //     message: "You are not authorized",
-    //   });
-    // }
+    const user = req.user;
+    if (user?.role !== "ADMIN") {
+      res.status(401).json({
+        code: 401,
+        message: "You are not authorized",
+      });
+    }
 
     const validateUser = await userSchema.validate(req.body, {
       abortEarly: false,
@@ -69,22 +69,34 @@ exports.createNewUser = async (req, res, next) => {
 
     const { name, email, password, role, permissions } = req.body;
 
-    const hashedPassword = await bcrypt.hash(password, 9);
+    const userFound = await User.find({ email: email });
 
-    const newUser = await User.create({
-      name: name,
-      email: email,
-      password: hashedPassword,
-      role: role,
-      permissions: permissions,
-    });
+    if (userFound) {
+      res.status(400).json({
+        message: "User Exists with this email",
+      });
+    }
+    else {
+      const hashedPassword = await bcrypt.hash(password, 9);
 
-    await newUser.save();
+      const newUser = await User.create({
+        name: name,
+        email: email,
+        password: hashedPassword,
+        role: role,
+        permissions: permissions,
+      });
+  
+      await newUser.save();
+  
+      res.status(200).json({
+        code: 200,
+        message: "User created successfully",
+      });
 
-    res.status(200).json({
-      code: 200,
-      message: "User created successfully",
-    });
+    }
+
+  
   } catch (e) {
     console.log(e, "error");
     if (e?.name === "ValidationError") {
@@ -140,6 +152,7 @@ exports.loginUser = async (req, res, next) => {
     }
 
     // Set session
+    
     req.session.isLoggedIn = true;
     req.session.userId = userFound._id;
 
@@ -186,14 +199,14 @@ exports.getUsers = async (req, res, next) => {
   console.log("users fetching");
   try {
     const user = req.user;
-    if (!user.role !== "ADMIN") {
+    if (user?.role !== "ADMIN") {
       res.status(401).json({
         code: 401,
         message: "You are not authorized",
       });
     }
 
-    const users = await User.find({});
+    const users = await User.find({ role: { $ne: "ADMIN" } });
 
     return res.status(200).json({
       message: "Users fetched successfully",
@@ -202,13 +215,7 @@ exports.getUsers = async (req, res, next) => {
     });
   } catch (e) {
     console.log(e, "errors");
-    if (e?.name === "ValidationError") {
-      return res.status(400).json({
-        success: false,
-        message: "Validation failed",
-        errors: e.errors,
-      });
-    }
+
     return res.status(500).json({
       success: false,
       message: "Server error",
@@ -219,7 +226,7 @@ exports.getUsers = async (req, res, next) => {
 
 exports.fetchUserDetails = async (req, res, next) => {
   try {
-    const userId = req.user._id;
+    const userId = req?.user?._id;
 
     console.log(userId, "user id received");
 
@@ -232,13 +239,79 @@ exports.fetchUserDetails = async (req, res, next) => {
       data: userDetails,
     });
   } catch (e) {
-    if (e?.name === "ValidationError") {
-      return res.status(400).json({
-        success: false,
-        message: "Validation failed",
-        errors: e.errors,
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: e.message,
+    });
+  }
+};
+
+exports.fetchSpecificUserDetails = async (req, res, next) => {
+  try {
+    const role = req?.user?.role;
+
+    if (role !== "ADMIN") {
+      res.status(401).json({
+        message: "You are not authorized",
       });
     }
+
+    const { id } = req.params;
+
+    if (!id) {
+      res.status(400).json({
+        message: "Invalid id or id not found",
+      });
+    }
+
+    const user = await User.findById(id);
+
+    res.status(200).json({
+      message: "User details fetched successfully",
+      data: user,
+      code: 200,
+    });
+  } catch (e) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: e.message,
+    });
+  }
+};
+
+exports.updateSpecificUser = async (req, res, next) => {
+  try {
+    const userRole = req.user?.role;
+
+    if (userRole !== "ADMIN") {
+      res.status(401).json({
+        message: "You are not authorized",
+      });
+    }
+
+    const { id } = req.params;
+
+    if (!id) {
+      res.status(400).json({
+        message: "Invalid or id not found",
+      });
+    }
+
+    const { name, email, role, permissions } = req.body;
+
+    await User.findByIdAndUpdate(id, {
+      name: name,
+      email: email,
+      role: role,
+      permissions: permissions,
+    });
+
+    res.status(200).json({
+      message: "User update successfully",
+    });
+  } catch (e) {
     return res.status(500).json({
       success: false,
       message: "Server error",
