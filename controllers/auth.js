@@ -69,7 +69,8 @@ exports.createNewUser = async (req, res, next) => {
 
     const { name, email, password, role, permissions } = req.body;
 
-    const userFound = await User.find({ email: email });
+    const userFound = await User.findOne({ email: email });
+    console.log(userFound, "user found");
 
     if (userFound) {
       res.status(400).json({
